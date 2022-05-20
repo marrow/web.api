@@ -21,7 +21,9 @@ An HTTP API client interface with a declarative approach to functional interface
 
 4. [Version History](#version-history)
 
-5. [License](#license)
+5. [Special Thanks](#special-thanks)
+
+6. [License](#license)
 
 
 ## Overview
