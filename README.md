@@ -95,7 +95,68 @@ If you would like to make changes and contribute them back to the project, fork 
 
 ## Getting Started
 
-Describe the basic steps required to utilize this package. Provide additional sections or subsections as needed. If this documentation exceeds an additional section or two, consider writing a GitBook instead.
+To begin exploring web-based APIs, import the base `Interface`, a specialization, and optionally mix-in behaviours, then construct an instance by passing the base path ("root") URI of the API tree.
+
+```python
+from web.api.client import Interface
+
+api = Interface('https://httpbin.org')
+```
+
+This base path may be provided as a string or [`URI`](https://github.com/marrow/uri#uri-1) instance. Technically, due to the use of `URI` internally, any object providing a `__link__` method returning a `URI` or string, or that is castable to a URI-like string can be provided.
+
+<!-- Goal: fully populate web.uri.typing module with appropriate abstract type information. -->
+
+The result is an API interface: (this programmers' representation is somewhat obvious)
+
+```
+Interface('https://httpbin.org')
+```
+
+
+### Locating an Endpoint
+
+Once you have the base API interface constructed, you can now descend through attributes and mapping dereferences to locate the endpoint you wish to actually request:
+
+```python
+code = 514
+endpoint = api.status[code]
+```
+
+This results in the following `endpoint` object:
+
+```
+Interface('https://httpbin.org/status/514')
+```
+
+
+### Invoking an Endpoint
+
+`Interface` instances are invokable directly, accepting a string verb as the only positional argument, a `_raw` boolean keyword argument which bypasses response processing by returning the underlying `Response` instance from the user agent, and will pass along all other keyword arguments down to that user agent.
+
+Utility methods are provided to streamline utilization of certain HTTP verbs. Each of these will issue a request using the specific verb:
+
+* `options`
+* `head`
+* `get`
+* `post`
+* `put`
+* `patch`
+* `delete`
+
+A few of these cases are most frequently used to pass data between client and server, and utilize differing approaches to doing so.
+
+#### HEAD, GET, DELETE
+
+With these methods, keyword arguments are automatically utilized as query string arguments by passing them through as the `params` argument in the ultimate call to the user agent. None of these HTTP verbs permit use of the HTTP request body to encode additional information.
+
+Additionally, query string arguments would be critical in determining the result of requests such as these.
+
+
+#### POST, PATCH
+
+When more authoritatively demanding information be persisted through the submission of an encoded request body, keyword arguments are interpreted by default as form-encoded POST data.
+
 
 
 ## Special Thanks
