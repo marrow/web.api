@@ -28,7 +28,7 @@ The first step in determining how best to tackle a concern is to ask about it. T
 
 * **GitHub Issues**
 
-  For problems relating to bugs or enhancements within the project, please utilize the [GitHub Issue Tracker](https://github.com/marrow/$repo/issues), making sure to pick the appropriate issue template, populating as needed.  If you have identified an issue and have already begun work on a feature branch, just issue a pull request instead of creating a ticket.
+  For problems relating to bugs or enhancements within the project, please utilize the [GitHub Issue Tracker](https://github.com/marrow/web.api/issues), making sure to pick the appropriate issue template, populating as needed.  If you have identified an issue and have already begun work on a feature branch, just issue a pull request instead of creating a ticket.
 
   Please do not use the issue tracker for general use and support questions.  IRC or Stack Overflow are better resources for quick questions or longer questions, respectively.
 
@@ -37,11 +37,11 @@ The first step in determining how best to tackle a concern is to ask about it. T
 
 * **Triage**
 
-  If you find an [unreviewed ticket](https://github.com/marrow/$repo/labels/org:triage) reporting a bug, try to reproduce it. If the problem appears valid make a note that you confirmed the bug.
+  If you find an [unreviewed ticket](https://github.com/marrow/web.api/labels/org:triage) reporting a bug, try to reproduce it. If the problem appears valid make a note that you confirmed the bug.
 
 * **Help Wanted**
 
-  Look through the [Help Wanted](https://github.com/marrow/$repo/labels/org:help-wanted) issues on GitHub. Look for tickets with greater numbers of reactions and comments to help gauge impact. If you feel it's a problem you can help solve, ask to be assigned.
+  Look through the [Help Wanted](https://github.com/marrow/web.api/labels/org:help-wanted) issues on GitHub. Look for tickets with greater numbers of reactions and comments to help gauge impact. If you feel it's a problem you can help solve, ask to be assigned.
 
 * **Write Some Documentation**
 
@@ -60,7 +60,7 @@ The first step in determining how best to tackle a concern is to ask about it. T
 
 * **Large (especially breaking) changes should be discussed.**
 
-  [Create issues](https://github.com/marrow/$repo/issues/new) for any major changes and enhancements that you wish to make. Discuss things transparently and get community feedback.
+  [Create issues](https://github.com/marrow/web.api/issues/new) for any major changes and enhancements that you wish to make. Discuss things transparently and get community feedback.
 
 * **Be excellent to each-other.**
 
