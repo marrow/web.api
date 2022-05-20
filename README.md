@@ -6,7 +6,8 @@
 
 > https://github.com/marrow/web.api
 
-Please describe the package here in few sentences; the goal is about a paragraph. Something easy to digest, but not too brief to give a good idea of what the package is for. For example, this is not a real package, it's a package template for "unpacking" on GitHub using their Repository Templates feature. You won't find this on the Python Package Index (Pypi).
+An HTTP API client interface with a declarative approach to functional interface definition. With an intuitive and native, Python object-attribute driven interface, no longer do you need to manually muck about constructing URI to pass to HTTPX, Requests, Client/Session middleware, proxy, or your preferred Requests-alike implementation.
+
 
 ## Contents
 
@@ -25,10 +26,38 @@ Please describe the package here in few sentences; the goal is about a paragraph
 
 ## Overview
 
-Provide a more detailed or in-depth description here, being sure to cover both rationale and goals.
+Have an API endpoint base path? You're good to go.
+
+```python
+from web.api.client import Interface
+
+api = Interface('https://httpbin.org')
+
+print(api.headers.get())
+```
+
+The response will be automatically negotiated and the data returned deserialized as appropriate.
+
+Any access to an otherwise unknown attribute of an Interface instance, or to dereference an item (list- or dict-like) from one, will result in a new instance of the same class specialized to a nested path below the base path. In the above example, the final HTTP GET request issued would be against:
+
+	https://httpbin.org/headers
+
+Dereferencing is supported to permit access to child paths that match the names of attributes that do exist, such as the methods for each of the HTTP verbs that may be issued, and to more easily facilitate variable path element substitution without unwieldy use of `getattr`.
+
+```python
+print(api['get'].get())
+```
+
+```python
+code = 304  # Use this way will automatically attempt to cast to a string.
+
+print(api.status[code].get())
+```
 
 
 ## Installation
+
+> No releases have been made available yet. Open source project is in the planning phase.
 
 Installing `web.api` is easy, just execute the following in a terminal:
 
