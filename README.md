@@ -107,7 +107,7 @@ This base path may be provided as a string or [`URI`](https://github.com/marrow/
 
 <!-- Goal: fully populate web.uri.typing module with appropriate abstract type information. -->
 
-The result is an API interface: (this programmers' representation is somewhat obvious)
+The result is an API interface: (this programmer's representation is somewhat obvious)
 
 ```
 Interface('https://httpbin.org')
