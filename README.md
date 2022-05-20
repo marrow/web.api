@@ -113,7 +113,7 @@ The result is an API interface: (this programmers' representation is somewhat ob
 Interface('https://httpbin.org')
 ```
 
-Keyword arguments other than `uri`, `accept`, `language`, or `ua` will be passed through to the construction of a new user agent instance, if `ua` was not provided. If `accept` or `language` are defined, the `Accept` and `Accept-Language` headers will be explicitly overridden, even if an existing user agent was provided.
+Keyword arguments other than `uri`, `accept`, `language`, or `ua` will be passed through to the construction of a new user agent instance, if `ua` was not provided. If `accept` or `language` are defined, the `Accept` and `Accept-Language` headers will be explicitly overridden, respectively, even if an existing user agent was provided.
 
 
 ### Locating an Endpoint
