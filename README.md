@@ -95,7 +95,7 @@ If you would like to make changes and contribute them back to the project, fork 
 
 ## Getting Started
 
-To begin exploring web-based APIs, import the base `Interface`, a specialization, and optionally mix-in behaviours, then construct an instance by passing the base path ("root") URI of the API tree.
+To begin exploring web-based APIs, import the base `Interface` or a specialization, and optionally mix-in behaviours, then construct an instance by passing the base path ("root") URI of the API tree.
 
 ```python
 from web.api.client import Interface
