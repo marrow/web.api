@@ -2,6 +2,7 @@ from time import time
 from itertools import count
 
 from uri import URI
+from uri.typing import URILike
 
 try:
 	from httpx import Client
@@ -42,7 +43,7 @@ class Interface:
 	_uri: URI  # The URI this instance represents a request factory for.
 	_ua: Client  # The "persistent session", "user agent", or "HTTP client" instance shared with children.
 	
-	def __init__(self, uri:Union[str, URI], accept:Optional[str]=None, language:Optional[str]=None, **,
+	def __init__(self, uri:URILike, /, accept:Optional[str]=None, language:Optional[str]=None, **,
 			ua:Optional[Client]=None, **kw):
 		"""Instantiate a new HTTP API interface.
 		
@@ -59,7 +60,7 @@ class Interface:
 		if accept: _ua.headers['Accept'] = accept
 		if language: _ua.headers['Accept-Language'] = language
 	
-	def __getattr__(self, name:str):  # -> Interface
+	def __getattr__(self, name:str) -> 'Interface':
 		"""Support use as an "attribute access" object whose attributes are interfaces to child paths.
 		
 		Only "missing" attribute lookups are intercepted and interpreted this way.
@@ -69,7 +70,7 @@ class Interface:
 		
 		return self.__getitem__(name)
 	
-	def __getitem__(self, name:str):  # -> Interface
+	def __getitem__(self, name:str) -> 'Interface':
 		"""Support use as a mapping object whose values are interfaces to child paths/endpoints.
 		
 			>>> api.jobboard.v1.vacancies[reference]
@@ -91,7 +92,7 @@ class Interface:
 		"""A useful "programmer's representation" for the instance in REPL shells."""
 		return f"{self.__class__.__name__}('{self._uri!s}')"
 	
-	def __call__(self, verb:str, **, _raw:bool=False, **kw) -> Response:
+	def __call__(self, verb:str, **, _raw:bool=False, **kw):
 		"""Invoke the targeted HTTP endpoint."""
 		
 		request = self._prepare(verb, kw)
@@ -112,7 +113,6 @@ class Interface:
 	def _process(self, response):
 		"""Process and validate the response, returning the data contained within, free of metadata."""
 		
-		# response.raise_for_status() -- nope, that's for a RESTful response validation/enforcement implementation.
 		# deserialize, in a modular way, warning if not part of Accept
 		
 		return response
