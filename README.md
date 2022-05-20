@@ -96,6 +96,11 @@ If you would like to make changes and contribute them back to the project, fork 
 Describe the basic steps required to utilize this package. Provide additional sections or subsections as needed. If this documentation exceeds an additional section or two, consider writing a GitBook instead.
 
 
+## Special Thanks
+
+This library would not exist without the support and motivation of working on commercial solutions for [CEGID, Inc.](https://www.cegid.com), Alice's employer. The core implementation was written for the [RITA Sourcer](https://www.cegid.com/fr-ca/produits/cegid-rita) job offer distribution platform, to facilitate integration of external APIs as data sources. Thank you to CEGID for being willing to, and allowing Alice to open-source components that are not business-critical trade secrets.
+
+
 ## Version History
 
 This project has yet to make any releases. When it does, each release should be documented here with a sub-section for the version, and a bulleted list of itemized changes tagged with the kind of change, e.g. *fixed*, *added*, *removed*, or *deprecated*.
