@@ -43,7 +43,7 @@ class Interface:
 	_ua: Client  # The "persistent session", "user agent", or "HTTP client" instance shared with children.
 	
 	def __init__(self, uri:Union[str, URI], accept:Optional[str]=None, language:Optional[str]=None, **,
-			ua:Optional[Client]=None):
+			ua:Optional[Client]=None, **kw):
 		"""Instantiate a new HTTP API interface.
 		
 		If specified, the `accept` argument will populate the `Accept` header of outgoing requests; similar with
@@ -54,7 +54,7 @@ class Interface:
 		"""
 		
 		self._uri = URI(uri)
-		self._ua = _ua = _ua or Client()  # Utilize an existing user-agent, if provided.
+		self._ua = _ua = _ua or Client(**kw)  # Utilize an existing user-agent, if provided.
 		
 		if accept: _ua.headers['Accept'] = accept
 		if language: _ua.headers['Accept-Language'] = language
