@@ -19,9 +19,9 @@ An HTTP API client interface with a declarative approach to functional interface
 
 3. [Getting Started](#getting-started)
 
-4. [Version History](#version-history)
+4. [Special Thanks](#special-thanks)
 
-5. [Special Thanks](#special-thanks)
+5. [Version History](#version-history)
 
 6. [License](#license)
 
