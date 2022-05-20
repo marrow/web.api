@@ -144,7 +144,7 @@ Utility methods are provided to streamline utilization of certain HTTP verbs. Ea
 * `patch`
 * `delete`
 
-A few of these cases are most frequently used to pass data between client and server, and utilize differing approaches to doing so.
+A few of these cases are most frequently used to pass data between client and server, and utilize differing approaches in doing so.
 
 #### HEAD, GET, DELETE
 
@@ -155,7 +155,7 @@ Additionally, query string arguments would be critical in determining the result
 
 #### POST, PATCH
 
-When more authoritatively demanding information be persisted through the submission of an encoded request body, keyword arguments are interpreted by default as form-encoded POST data.
+When more authoritatively demanding information be persisted through the submission of an encoded request body, keyword arguments are interpreted by default as form-encoded POST data. This is passed through to the user agent call as the `data` argument.
 
 
 
