@@ -2,12 +2,13 @@ from time import time
 from itertools import count
 
 from uri import URI
-from uri.typing import URILike
 
 try:
 	from httpx import Client
 except ImportError:  # Fall back on "plain" requests if HTTPX not present.
 	from requests import Session as Client
+
+from .typing import Optional, URILike
 
 
 log = __import__('logging').getLogger(__name__)
@@ -20,7 +21,7 @@ class Interface:
 	Use is dynamic; create an instance of this class, providing a base URI. Then access attributes of that instance,
 	hierarchically, to access specific API endpoints below that base URI. E.x.:
 	
-		>>> api = Interface('https://httpbin.org')
+		>>> api = Interface('https://httpbin.org/')
 		>>> api.headers.get()
 		...
 	
@@ -43,8 +44,7 @@ class Interface:
 	_uri: URI  # The URI this instance represents a request factory for.
 	_ua: Client  # The "persistent session", "user agent", or "HTTP client" instance shared with children.
 	
-	def __init__(self, uri:URILike, /, accept:Optional[str]=None, language:Optional[str]=None, **,
-			ua:Optional[Client]=None, **kw):
+	def __init__(self, uri:URILike, /, accept:Optional[str]=None, language:Optional[str]=None, *, ua:Optional[Client]=None, **kw):
 		"""Instantiate a new HTTP API interface.
 		
 		If specified, the `accept` argument will populate the `Accept` header of outgoing requests; similar with
@@ -55,10 +55,10 @@ class Interface:
 		"""
 		
 		self._uri = URI(uri)
-		self._ua = _ua = _ua or Client(**kw)  # Utilize an existing user-agent, if provided.
+		self._ua = ua = ua or Client(**kw)  # Utilize an existing user-agent, if provided.
 		
-		if accept: _ua.headers['Accept'] = accept
-		if language: _ua.headers['Accept-Language'] = language
+		if accept: ua.headers['Accept'] = accept
+		if language: ua.headers['Accept-Language'] = language
 	
 	def __getattr__(self, name:str) -> 'Interface':
 		"""Support use as an "attribute access" object whose attributes are interfaces to child paths.
@@ -92,7 +92,7 @@ class Interface:
 		"""A useful "programmer's representation" for the instance in REPL shells."""
 		return f"{self.__class__.__name__}('{self._uri!s}')"
 	
-	def __call__(self, verb:str, **, _raw:bool=False, **kw):
+	def __call__(self, verb:str, *, _raw:bool=False, **kw):
 		"""Invoke the targeted HTTP endpoint."""
 		
 		request = self._prepare(verb, kw)
