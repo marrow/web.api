@@ -36,7 +36,7 @@ veryclean: clean
 test:
 	@echo " \033[1;34m*\033[0m Testing \033[1m${PROJECT}\033[0m..."
 	
-	./setup.py -q test
+	pytest
 
 
 ${PROJECT}.egg-info/PKG-INFO: setup.py setup.cfg
