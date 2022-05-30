@@ -8,6 +8,8 @@ from marrow.package.loader import traverse
 
 
 class Validated:
+	"""Validate the HTTP response status code."""
+	
 	def _process(self, response):
 		response.raise_for_status()
 		response = super()._process(response)
@@ -16,12 +18,16 @@ class Validated:
 
 
 class Body:
+	"""Retrieve only the body of the response."""
+	
 	def _process(self, response):
 		response = super()._process(response)
 		return response.body
 
 
 class Serialized:
+	"""Automatically process serialized responses by de-serializing them to native Python objects."""
+	
 	def _process(self, response):
 		response = super()._process(response)
 		# TODO: Actually negotiate. ;P
