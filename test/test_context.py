@@ -6,9 +6,9 @@ from pytest import fixture
 from web.api.client import Interface
 
 
-class TestingInterface(Interface):
+class TInterface(Interface):
 	def __init__(self, *args, **kw):
-		super(TestingInterface, self).__init__(*args, **kw)
+		super(TInterface, self).__init__(*args, **kw)
 		
 		self.entered = False
 		self.authenticated = False
@@ -23,16 +23,16 @@ class TestingInterface(Interface):
 	
 	def __enter__(self):
 		self.entered = True
-		return super(TestingInterface, self).__enter__()
+		return super(TInterface, self).__enter__()
 	
 	def __exit__(self, exc_type, exc_value, traceback):
 		self.entered = False
-		return super(TestingInterface, self).__exit__(exc_type, exc_type, traceback)
+		return super(TInterface, self).__exit__(exc_type, exc_type, traceback)
 
 
 @fixture
 def iface():
-	return TestingInterface('https://httpbin.org/')
+	return TInterface('https://httpbin.org/')
 
 
 def test_context_management(iface):
