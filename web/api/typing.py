@@ -1,7 +1,14 @@
 # From: https://github.com/marrow/uri/blob/develop/uri/typing.py
 # TODO: Upon next URI release, remove this.
 
-from typing import ClassVar, Iterable, Mapping, Optional, Protocol, T, Union, abstractmethod
+from typing import ClassVar, Iterable, Mapping, Optional, Protocol, T, Type, Union, abstractmethod
+
+from types import TracebackType
+
+
+ExcType = Optional[Type[BaseException]]
+ExcValue = Optional[BaseException]
+Trace = Optional[TracebackType]
 
 
 class Stringy(Protocol):
@@ -44,4 +51,3 @@ class LinkableMethod(Protocol):
 
 # Any object that may in some way provide a URI.
 URILike = Union[Stringy, PathURI, Linkable, LinkableMethod]
-

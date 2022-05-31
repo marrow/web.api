@@ -4,15 +4,14 @@ from itertools import count
 from uri import URI
 
 try:
-	from httpx import Client
+	from httpx import Client, Request, Request as PreparedRequest, Response
 except ImportError:  # Fall back on "plain" requests if HTTPX not present.
-	from requests import Session as Client
+	from requests import Session as Client, Request, PreparedRequest, Response
 
-from .typing import Optional, URILike
+from .typing import ExcType, ExcValue, Optional, Trace, URILike
 
 
 log = __import__('logging').getLogger(__name__)
-
 
 
 class Interface:
@@ -41,14 +40,17 @@ class Interface:
 		...
 	"""
 	
+	_sane: bool = True  # The remote API utilizes HTTP status codes in a sane way.
 	_uri: URI  # The URI this instance represents a request factory for.
 	_ua: Client  # The "persistent session", "user agent", or "HTTP client" instance shared with children.
 	
-	def __init__(self, uri:URILike, /, accept:Optional[str]=None, language:Optional[str]=None, *, ua:Optional[Client]=None, **kw):
+	def __init__(self, uri:URILike, /, accept:Optional[str]=None, language:Optional[str]=None, *,
+			ua:Optional[Client]=None, **kw):
 		"""Instantiate a new HTTP API interface.
 		
 		If specified, the `accept` argument will populate the `Accept` header of outgoing requests; similar with
-		`language` populating the `Accept-Language` header.
+		`language` populating the default `Accept-Language` header. These may be overridden per-request by supplying
+		alternative `headers`.
 		
 		Your own preconfigured Requests `Session`, HTTPX `Client`, or compatible user agent can be provided using the
 		keyword-only `ua` argument. The instance provided will be passed down to and reused by all child instances.
@@ -92,17 +94,50 @@ class Interface:
 		"""A useful "programmer's representation" for the instance in REPL shells."""
 		return f"{self.__class__.__name__}('{self._uri!s}')"
 	
-	def __call__(self, verb:str, *, _raw:bool=False, **kw):
+	def __call__(self, verb:str, *, _raw:bool=False, **kw):  # Return not defined as subclass _process may mutate.
 		"""Invoke the targeted HTTP endpoint."""
 		
+		self._authenticate()
 		request = self._prepare(verb, kw)
 		response = self._ua.send(request)
 		
-		if _raw: return resopnse
+		if _raw: return response
 		
-		return self._process(response)
+		return self._process(request, response)
 	
-	def _prepare(self, verb:str, arguments:dict):
+	# Context (Connection) Management
+	
+	def __enter__(self) -> 'Interface':
+		"""Utilize Python's "context manager" functionality as a form of session state."""
+		self._ua.__enter__()  # The upstream HTTPX or Requests session/client returns self.
+		self._authenticate()  # Perform authentication as part of "session establishment" entering the context.
+		return self
+	
+	def __exit__(self, exc_type:ExcType, exc_value:ExcValue, traceback:Trace):
+		"""De-authenticate as needed and automatically close any hanging HTTP server connections."""
+		self._deauthenticate()  # Perform the inverse of logging in when exiting the context.
+		self._ua.__exit__(exc_type, exc_value, traceback)
+	
+	# Access Control / Authentication / Authorization
+	
+	def _authenticate(self):
+		"""Perform any requests or configuration required to authenticate or authorize subsequent requests.
+		
+		To prevent unintentional infinite recursion, requests issued within this method should be submitted by way of
+		`self._ua` directly. It is the responsibility of the Interface specialization or mix-in implementing this to
+		identify if authentication is *actually* required as this method will be called prior to every request.
+		"""
+		
+		pass
+	
+	def _deauthenticate(self):
+		"""Perform the cleanup work or issue a request required to de-authenticate."""
+		
+		pass
+	
+	# Request/Response Lifecycle Processing
+	
+	def _prepare(self, verb:str, arguments:dict) -> PreparedRequest:
 		"""Prepare the outbound request prior to invocation.
 		
 		Subclasses MUST super()._prepare(…) early.
@@ -110,19 +145,23 @@ class Interface:
 		
 		return self._ua.build_request(verb, str(self._uri), **arguments)
 	
-	def _process(self, response):
+	def _process(self, request:Request, response:Response):  # As per __call__ itself, may free of encapsulation.
 		"""Process and validate the response, returning the data contained within, free of metadata."""
 		
-		# deserialize, in a modular way, warning if not part of Accept
+		# De-serialize, in a modular way, warning if not part of the original Accept.
+		
+		if self._sane: response.raise_for_status()
 		
 		return response
+	
+	# HTTP Verbs
 	
 	def options(self):  # XXX: Do query string arguments matter to OPTIONS?
 		"""Retrieve the raw response of an HTTP OPTIONS request to this URI endpoint."""
 		
 		return self('OPTIONS', _raw=True)
 	
-	def head(self, **params):
+	def head(self, **params) -> Response:
 		"""Issue a raw HTTP HEAD request to this endpoint, using keyword arguments as query string parameters."""
 		
 		return self('HEAD', params=params, _raw=True)
@@ -151,8 +190,7 @@ class Interface:
 		
 		return self('PATCH', data=data)
 	
-	def delete(self, **params):
+	def delete(self, **params) -> Response:
 		"""Issue a raw HTTP DELETE request to this endpoint, using keyword arguments as query string parameters."""
 		
 		return self('DELETE', params=params, _raw=True)
-
