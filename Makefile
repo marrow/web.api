@@ -35,8 +35,7 @@ veryclean: clean
 
 test:
 	@echo " \033[1;34m*\033[0m Testing \033[1m${PROJECT}\033[0m..."
-	
-	pytest
+	pytest -W ignore::DeprecationWarning:uri.bucket: -W ignore::DeprecationWarning:uri.qso:
 
 
 ${PROJECT}.egg-info/PKG-INFO: setup.py setup.cfg
