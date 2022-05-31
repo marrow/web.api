@@ -156,10 +156,10 @@ class Interface:
 	
 	# HTTP Verbs
 	
-	def options(self):  # XXX: Do query string arguments matter to OPTIONS?
+	def options(self, **params):
 		"""Retrieve the raw response of an HTTP OPTIONS request to this URI endpoint."""
 		
-		return self('OPTIONS', _raw=True)
+		return self('OPTIONS', params=params, _raw=True)
 	
 	def head(self, **params) -> Response:
 		"""Issue a raw HTTP HEAD request to this endpoint, using keyword arguments as query string parameters."""
