@@ -5,5 +5,7 @@ from web.api.client import Interface
 
 @pytest.fixture()
 def iface():
-	return Interface('https://httpbin.org/')
+	interface = Interface('https://httpbin.org/')
+	yield interface
+	interface._ua.close()
 
