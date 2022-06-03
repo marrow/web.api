@@ -4,15 +4,27 @@ This module provides mix-in classes to use to construct specialized Interface su
 automatic response processing. The order in which you inherit determines the order of the processing pipeline.
 """
 
+from typing import Mapping, Optional
+
+from typeguard import check_argument_types
+
+from marrow.package.host import PluginManager
 from marrow.package.loader import traverse
+
+try:
+	from httpx import Request, Response
+except ImportError:  # Fall back on "plain" requests if HTTPX not present.
+	from requests import Request, Response
 
 
 class Validated:
 	"""Validate the HTTP response status code."""
 	
-	def _process(self, response):
+	def _process(self, request:Request, response:Response):
+		assert check_argument_types()
+		
 		response.raise_for_status()
-		response = super()._process(response)
+		response = super()._process(request, response)
 		
 		return response
 
@@ -20,18 +32,30 @@ class Validated:
 class Body:
 	"""Retrieve only the body of the response."""
 	
-	def _process(self, response):
-		response = super()._process(response)
+	def _process(self, request:Request, response:Response) -> str:
+		assert check_argument_types()
+		
+		response = super()._process(request, response)
 		return response.body
 
 
 class Serialized:
-	"""Automatically process serialized responses by de-serializing them to native Python objects."""
+	"""Automatically process serialized responses by de-serializing them to native Python objects.
 	
-	def _process(self, response):
-		response = super()._process(response)
-		# TODO: Actually negotiate. ;P
-		return response.json()
+	Utilizes content-type-based plugin loading via standard entry_points in the `web.deserialize` namespace.
+	"""
+	
+	_loads = PluginManager('web.deserialize')
+	
+	def _process(self, request:Request, response:Response):  # Can theoretically return any serialized type.
+		assert check_argument_types()
+		
+		response = super()._process(request, response)
+		
+		mime: str = req.content_type.partition(';')[0]
+		loads: Deserializer = self._loads[mime]
+		
+		return loads(response.text())
 
 
 class Envelope(Serialized):
@@ -55,13 +79,18 @@ class Envelope(Serialized):
 	If no `_content` key path is provided the whole de-serialized response is returned and this only validates.
 	"""
 	
-	_success: str  # The path to a boolean indicating success if True.
-	_failure: str  # The path to a boolean indicating failure if True.
-	_message: str  # The path to the message returned representing a summary of the transaction.
-	_content: str  # The path to the actual response content.
+	# Override these attributes in subclasses.
+	_success: Optional[str] = None  # The path to a boolean indicating success if present and truthy.
+	_failure: Optional[str] = None  # The path to a boolean indicating failure if present and truthy.
+	_message: Optional[str] = None  # The path to the message returned representing a summary of the transaction.
+	_content: Optional[str] = None  # The path to the actual response content.
 	
-	def _process(self, response):
-		result = super()._process(response)
+	def _process(self, request:Request, response:Mapping):
+		"""Process the response, validate 'envelope' metadata, and extract wrapped content."""
+		
+		assert check_argument_types()  # Must have been de-serialized prior to reaching us.
+		
+		result = super()._process(request, response)
 		
 		if self._success and not traverse(result, self._success) or self._failure and traverse(result, self._failure):
 			raise ValueError("Request not successful.", extra={'message': traverse(result, self._message, None)})
