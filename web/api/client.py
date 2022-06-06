@@ -1,6 +1,7 @@
 from time import time
 from itertools import count
 
+from typeguard import check_argument_types
 from uri import URI
 
 try:
