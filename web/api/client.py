@@ -31,7 +31,7 @@ class Interface:
 		URI('https://httpbin.org/headers')
 	
 	If you need to access a path whose name conflicts with a legitimate attribute, or wish to simplify variable path
-	element access so as to not involve getattr calls, utilize array dereferencing:
+	element access so as to not involve `getattr` calls, utilize array dereferencing:
 	
 		>>> api['get'].get()
 		...
@@ -39,6 +39,21 @@ class Interface:
 		>>> code = 304  # Use this way will automatically attempt to cast to a string.
 		>>> api.status[code].get()
 		...
+	
+	Individual requests issued from a given interface instance, or a descendant of the same, share a common "user
+	agent"; Requests `Session` or HTTPX `Client` instance. This results in a somewhat browser-like experience as
+	cookies will persist between requests for the lifetime of those instances, for those instances.
+	
+	Connections will also be pooled and held open where needed, depending on the capability of the user agent
+	implementation. To manage these, you may directly invoke `iface._ua.close()` where needed, or can utilize a base
+	interface instance as a context manager:
+	
+		>>> with Interface('https://httpbin.org/') as api: api.headers.get()
+		...
+	
+	Connections will be automatically cleaned up when exiting the context. Instances, and their descendants, can not
+	be re-used once the user agent has been "closed". Always remember to use derivatives of a fresh `Interface`
+	instance when issuing subsequent requests.
 	"""
 	
 	_sane: bool = True  # The remote API utilizes HTTP status codes in a sane way.
@@ -115,7 +130,11 @@ class Interface:
 		return self
 	
 	def __exit__(self, exc_type:ExcType, exc_value:ExcValue, traceback:Trace):
-		"""De-authenticate as needed and automatically close any hanging HTTP server connections."""
+		"""De-authenticate as needed and automatically close any hanging HTTP server connections.
+		
+		Interface objects sharing the same client interface (Requests Session, HTTPX Client, etc.) can not be utilized
+		further after exiting the context. User agent implementations do not issue further requests once "closed".
+		"""
 		self._deauthenticate()  # Perform the inverse of logging in when exiting the context.
 		self._ua.__exit__(exc_type, exc_value, traceback)
 	
