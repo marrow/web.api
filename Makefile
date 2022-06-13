@@ -38,6 +38,12 @@ test:
 	pytest -W ignore::DeprecationWarning:uri.bucket: -W ignore::DeprecationWarning:uri.qso:
 
 
+testloop:
+	find web test -name \*.py | entr -c \
+		pytest --ff --maxfail=1 \
+		-W ignore::DeprecationWarning:uri.bucket: -W ignore::DeprecationWarning:uri.qso:
+
+
 ${PROJECT}.egg-info/PKG-INFO: setup.py setup.cfg
 	@echo " \033[1;32m*\033[0m Collecting \033[1m${PROJECT}\033[0m metadata..."
 	
