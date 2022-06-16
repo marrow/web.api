@@ -26,10 +26,6 @@ class TestValidation:
 	def test_success(self, iface):
 		iface.status[200].get()
 	
-	#def test_redirection(self, iface):
-	#	result = iface.status[302].get()
-	#	__import__('wdb').set_trace()
-	
 	def test_client_error(self, iface):
 		with raises(HTTPError):
 			iface.status[400].get()
