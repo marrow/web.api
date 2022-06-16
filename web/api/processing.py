@@ -4,7 +4,9 @@ This module provides mix-in classes to use to construct specialized Interface su
 automatic response processing. The order in which you inherit determines the order of the processing pipeline.
 """
 
-from typing import Mapping, Optional
+from pkg_resources import Distribution, UnknownExtra, DistributionNotFound
+from typing import Any, Callable, Mapping, Optional
+from xml.etree import ElementTree as ET
 
 from typeguard import check_argument_types
 
@@ -17,10 +19,34 @@ except ImportError:  # Fall back on "plain" requests if HTTPX not present.
 	from requests import Request, Response
 
 
+Deserializer = Callable[[str], Any]
+
+log = __import__('logging').getLogger(__name__)
+
+
+class SafePluginManager(PluginManager):
+	def _register(self, dist:Distribution) -> None:
+		assert check_argument_types()
+		entries = dist.get_entry_map(self.namespace)
+		
+		if not entries:
+			return
+		
+		for name in entries:
+			try:
+				plugin = entries[name].load()
+			
+			except (UnknownExtra, DistributionNotFound):  # pragma: no cover - TODO: Figure out how to test this.
+				log.warning("Skipping registration of '{!r}' due to missing dependencies.".format(dist), exc_info=True)
+			
+			except ImportError:  # pragma: no cover - TODO: Figure out how to test this.
+				log.error("Skipping registration of '{!r}' due to error on import.".format(dist), exc_info=True)
+
+
 class Validated:
 	"""Validate the HTTP response status code."""
 	
-	def _process(self, request:Request, response:Response):
+	def _process(self, request:Request, response:Response) -> Response:
 		assert check_argument_types()
 		
 		response.raise_for_status()
@@ -30,32 +56,45 @@ class Validated:
 
 
 class Body:
-	"""Retrieve only the body of the response."""
+	"""Retrieve only the binary body of the response."""
+	
+	def _process(self, request:Request, response:Response) -> bytes:
+		assert check_argument_types()
+		
+		response = super()._process(request, response)
+		return response.content
+
+
+class Text:
+	"""Retrieve only the textual body content of the response."""
 	
 	def _process(self, request:Request, response:Response) -> str:
 		assert check_argument_types()
 		
 		response = super()._process(request, response)
-		return response.body
+		return response.text
 
 
-class Serialized:
+class Serialized(Text):
 	"""Automatically process serialized responses by de-serializing them to native Python objects.
 	
 	Utilizes content-type-based plugin loading via standard entry_points in the `web.deserialize` namespace.
 	"""
 	
-	_loads = PluginManager('web.deserialize')
+	_loads = SafePluginManager('web.deserialize')
 	
-	def _process(self, request:Request, response:Response):  # Can theoretically return any serialized type.
+	def _process(self, request:Request, response:Response) -> Any:  # Can theoretically return any serialized type.
 		assert check_argument_types()
+		
+		mime: str = response.headers['Content-Type'].partition(';')[0]
+		loads: Deserializer = self._loads[mime]
 		
 		response = super()._process(request, response)
 		
-		mime: str = req.content_type.partition(';')[0]
-		loads: Deserializer = self._loads[mime]
+		if not response:
+			return response
 		
-		return loads(response.text())
+		return loads(response)
 
 
 class Envelope(Serialized):
@@ -96,4 +135,3 @@ class Envelope(Serialized):
 			raise ValueError("Request not successful.", extra={'message': traverse(result, self._message, None)})
 		
 		return traverse(result, self._content) if self._content else result
-
