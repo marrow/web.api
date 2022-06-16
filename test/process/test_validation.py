@@ -37,4 +37,3 @@ class TestValidation:
 	def test_server_error(self, iface):
 		with raises(HTTPError):
 			iface.status[500].get()
-
