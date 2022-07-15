@@ -100,7 +100,7 @@ class Interface:
 		Otherwise, these two forms are identical.
 		"""
 		
-		return self.__class__(f'{self._uri!s}/{name}', ua=self._ua)  # TODO: URI division...
+		return self.__class__(f'{str(self._uri).rstrip("/")}/{name}', ua=self._ua)  # TODO: URI division...
 	
 	def __link__(self) -> URI:
 		"""Retrieve the URI for the endpoint targeted by this instance. A URI protocol method for typecasting."""
