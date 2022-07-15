@@ -12,14 +12,13 @@ from typeguard import check_argument_types
 
 from marrow.package.host import PluginManager
 from marrow.package.loader import traverse
+from web.api.typing import Deserializer
 
 try:
 	from httpx import Request, Response
 except ImportError:  # Fall back on "plain" requests if HTTPX not present.
 	from requests import Request, Response
 
-
-Deserializer = Callable[[str], Any]
 
 log = __import__('logging').getLogger(__name__)
 
@@ -36,10 +35,10 @@ class SafePluginManager(PluginManager):
 			try:
 				plugin = entries[name].load()
 			
-			except (UnknownExtra, DistributionNotFound):  # pragma: no cover - TODO: Figure out how to test this.
+			except (UnknownExtra, DistributionNotFound):  # pragma: no cover
 				log.warning("Skipping registration of '{!r}' due to missing dependencies.".format(dist), exc_info=True)
 			
-			except ImportError:  # pragma: no cover - TODO: Figure out how to test this.
+			except ImportError:  # pragma: no cover
 				log.error("Skipping registration of '{!r}' due to error on import.".format(dist), exc_info=True)
 
 
