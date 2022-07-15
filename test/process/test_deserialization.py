@@ -1,7 +1,6 @@
 # It is often desirable to proactively catch errors being returned by third-party APIs.
 # You can mix-in the Validated class to apply this behavior.
 
-# from httpx import HTTPStatusError
 from pytest import fixture, importorskip
 
 from web.api.client import Interface
