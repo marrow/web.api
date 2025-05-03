@@ -8,3 +8,4 @@ def iface():
 	interface = Interface('https://httpbin.org/')
 	yield interface
 	interface._ua.close()
+

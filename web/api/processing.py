@@ -134,3 +134,4 @@ class Envelope(Serialized):
 			raise ValueError("Request not successful.", extra={'message': traverse(result, self._message, None)})
 		
 		return traverse(result, self._content) if self._content else result
+

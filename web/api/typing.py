@@ -53,3 +53,4 @@ URILike = Union[Stringy, PathURI, Linkable, LinkableMethod]
 
 # Request body deserializer, accepting a string and returning any arbitrary deserialized object.
 Deserializer = Callable[[str], Any]
+

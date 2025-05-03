@@ -11,3 +11,4 @@ class TestPersistence:
 		# Validate that the root session applied to the child request.
 		assert 'Cookie' in result['headers']
 		assert result['headers']['Cookie'] == 'test=42'
+
