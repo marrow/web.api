@@ -80,3 +80,4 @@ The first step in determining how best to tackle a concern is to ask about it. T
 Financial contributions are welcome. To arrange a one-time donation, please contact `GothAlice` on IRC (see details above) and for more ongoing support we have [Patreon](https://www.patreon.com/GothAlice) prepared for you. We have rewards (such as inclusion in the [Patrons team on GitHub](https://github.com/orgs/marrow/teams/patrons) plus our eternal gratitude) and goals, so please give it a look; every penny helps pay for infrastructure costs and caffeine. So much caffeine.
 
 If at any point you wish or need to cease recurring donations, do not feel bad. Don't put yourself out on our account, and thank you!
+
